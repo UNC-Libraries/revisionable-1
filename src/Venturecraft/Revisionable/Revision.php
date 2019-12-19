@@ -70,18 +70,18 @@ class Revision extends Eloquent
      *
      * Allow overrides for field names.
      *
-     * @param $key
+     * @param $field
      *
      * @return bool
      */
-    private function formatFieldName($key)
+    private function formatFieldName($field)
     {
         $related_model = $this->getActualClassNameForMorph($this->revisionable_type);
         $related_model = new $related_model;
         $revisionFormattedFieldNames = $related_model->getRevisionFormattedFieldNames();
 
-        if (isset($revisionFormattedFieldNames[$key])) {
-            return $revisionFormattedFieldNames[$key];
+        if (isset($revisionFormattedFieldNames[$field])) {
+            return $revisionFormattedFieldNames[$field];
         }
 
         return false;
@@ -273,19 +273,19 @@ class Revision extends Eloquent
     /**
      * Format the value according to the $revisionFormattedFields array.
      *
-     * @param  $key
+     * @param  $field
      * @param  $value
      *
      * @return string formatted value
      */
-    public function format($key, $value)
+    public function format($field, $value)
     {
         $related_model = $this->getActualClassNameForMorph($this->revisionable_type);
         $related_model = new $related_model;
         $revisionFormattedFields = $related_model->getRevisionFormattedFields();
 
-        if (isset($revisionFormattedFields[$key])) {
-            return FieldFormatter::format($key, $value, $revisionFormattedFields);
+        if (isset($revisionFormattedFields[$field])) {
+            return FieldFormatter::format($field, $value, $revisionFormattedFields);
         } else {
             return $value;
         }
