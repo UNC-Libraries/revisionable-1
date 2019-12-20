@@ -169,7 +169,7 @@ class Revision extends Eloquent
                     // Check if model use RevisionableTrait
                     if(method_exists($item, 'identifiableName')) {
                         // see if there's an available mutator
-                        $mutator = 'get' . Str::studly($this->field . 'Attribute';
+                        $mutator = 'get' . Str::studly($this->field) . 'Attribute';
                         if (method_exists($item, $mutator)) {
                             return $this->format($item->$mutator($this->field), $item->identifiableName());
                         }
