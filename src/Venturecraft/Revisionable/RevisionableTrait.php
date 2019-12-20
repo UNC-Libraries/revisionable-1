@@ -345,7 +345,7 @@ trait RevisionableTrait
      */
     private function isRevisionable($key)
     {
-        if ($field === 'updated_at') {
+        if ($key === 'updated_at') {
           return false;
         }
         // If the field is explicitly revisionable, then return true.
