@@ -105,7 +105,7 @@ trait RevisionableTrait
     public static function classRevisionHistory($limit = 100, $order = 'desc')
     {
         $model = Revisionable::newModel();
-        return $model->where('revisionable_type', get_called_class())
+        return $model->where('revisionable_type', class_basename(get_called_class()))
             ->orderBy('updated_at', $order)->limit($limit)->get();
     }
 
