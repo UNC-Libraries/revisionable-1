@@ -180,7 +180,8 @@ class Revision extends Eloquent
             // if there was an issue
             // or, if it's a normal value
 
-            $mutator = 'get' . Str::studly($this->field) . 'Attribute';
+            // the accessor method is called getFieldDisplayAttribute in JB
+            $mutator = 'get' . Str::studly($this->field) . 'DisplayAttribute';
             if (method_exists($main_model, $mutator)) {
                 return $this->format($this->field, $main_model->$mutator($this->$which_value));
             }
