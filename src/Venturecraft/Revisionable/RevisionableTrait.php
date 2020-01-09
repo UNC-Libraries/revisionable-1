@@ -105,7 +105,7 @@ trait RevisionableTrait
     public static function classRevisionHistory($limit = 100, $order = 'desc')
     {
         $model = Revisionable::newModel();
-        return $model->where('revisionable_type', get_called_class())
+        return $model->where('revisionable_type', class_basename(get_called_class()))
             ->orderBy('updated_at', $order)->limit($limit)->get();
     }
 
@@ -189,7 +189,9 @@ trait RevisionableTrait
                 $revisions[] = array(
                     'revisionable_type' => $this->getMorphClass(),
                     'revisionable_id' => $this->getKey(),
-                    'key' => $key,
+                    'transaction_id'        => $this->getTransactionId(),
+                    'ip_address'            => \Request::ip(),
+                    'field' => $key,
                     'old_value' => Arr::get($this->originalData, $key),
                     'new_value' => $this->updatedData[$key],
                     'user_id' => $this->getSystemUserId(),
@@ -231,7 +233,9 @@ trait RevisionableTrait
             $revisions[] = array(
                 'revisionable_type' => $this->getMorphClass(),
                 'revisionable_id' => $this->getKey(),
-                'key' => self::CREATED_AT,
+                'transaction_id'        => $this->getTransactionId(),
+                'ip_address'            => \Request::ip(),
+                'field' => self::CREATED_AT,
                 'old_value' => null,
                 'new_value' => $this->{self::CREATED_AT},
                 'user_id' => $this->getSystemUserId(),
@@ -258,7 +262,9 @@ trait RevisionableTrait
             $revisions[] = array(
                 'revisionable_type' => $this->getMorphClass(),
                 'revisionable_id' => $this->getKey(),
-                'key' => $this->getDeletedAtColumn(),
+                'transaction_id'        => $this->getTransactionId(),
+                'ip_address'            => \Request::ip(),
+                'field' => $this->getDeletedAtColumn(),
                 'old_value' => null,
                 'new_value' => $this->{$this->getDeletedAtColumn()},
                 'user_id' => $this->getSystemUserId(),
@@ -291,6 +297,16 @@ trait RevisionableTrait
         }
 
         return null;
+    }
+
+    /**
+     * Get the transaction that this revision is a part of. This value
+     * is set from within the transaction block in Jitterbug while saving
+     * your revisionable model.
+     **/
+    public function getTransactionId()
+    {
+      return \DB::select('select @transaction_id as id;')[0]->id;
     }
 
     /**
@@ -329,7 +345,9 @@ trait RevisionableTrait
      */
     private function isRevisionable($key)
     {
-
+        if ($key === 'updated_at') {
+          return false;
+        }
         // If the field is explicitly revisionable, then return true.
         // If it's explicitly not revisionable, return false.
         // Otherwise, if neither condition is met, only return true if

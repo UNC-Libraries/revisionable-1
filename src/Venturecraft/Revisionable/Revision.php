@@ -56,12 +56,12 @@ class Revision extends Eloquent
      */
     public function fieldName()
     {
-        if ($formatted = $this->formatFieldName($this->key)) {
+        if ($formatted = $this->formatFieldName($this->field)) {
             return $formatted;
-        } elseif (strpos($this->key, '_id')) {
-            return str_replace('_id', '', $this->key);
+        } elseif (strpos($this->field, '_id')) {
+            return str_replace('_id', '', $this->field);
         } else {
-            return $this->key;
+            return $this->field;
         }
     }
 
@@ -70,18 +70,18 @@ class Revision extends Eloquent
      *
      * Allow overrides for field names.
      *
-     * @param $key
+     * @param $field
      *
      * @return bool
      */
-    private function formatFieldName($key)
+    private function formatFieldName($field)
     {
         $related_model = $this->getActualClassNameForMorph($this->revisionable_type);
         $related_model = new $related_model;
         $revisionFormattedFieldNames = $related_model->getRevisionFormattedFieldNames();
 
-        if (isset($revisionFormattedFieldNames[$key])) {
-            return $revisionFormattedFieldNames[$key];
+        if (isset($revisionFormattedFieldNames[$field])) {
+            return $revisionFormattedFieldNames[$field];
         }
 
         return false;
@@ -148,7 +148,12 @@ class Revision extends Eloquent
 
                     // Finally, now that we know the namespace of the related model
                     // we can load it, to find the information we so desire
-                    $item = $related_class::find($this->$which_value);
+                    $item;
+                    if (array_key_exists('Illuminate\Database\Eloquent\SoftDeletes', class_uses($related_class))) {
+                      $item = $related_class::withTrashed()->find($this->$which_value);
+                    } else {
+                      $item = $related_class::find($this->$which_value);
+                    }
 
                     if (is_null($this->$which_value) || $this->$which_value == '') {
                         $item = new $related_class;
@@ -158,18 +163,18 @@ class Revision extends Eloquent
                     if (!$item) {
                         $item = new $related_class;
 
-                        return $this->format($this->key, $item->getRevisionUnknownString());
+                        return $this->format($this->field, $item->getRevisionUnknownString());
                     }
 
                     // Check if model use RevisionableTrait
                     if(method_exists($item, 'identifiableName')) {
                         // see if there's an available mutator
-                        $mutator = 'get' . Str::studly($this->key) . 'Attribute';
+                        $mutator = 'get' . Str::studly($this->field) . 'Attribute';
                         if (method_exists($item, $mutator)) {
-                            return $this->format($item->$mutator($this->key), $item->identifiableName());
+                            return $this->format($item->$mutator($this->field), $item->identifiableName());
                         }
 
-                        return $this->format($this->key, $item->identifiableName());
+                        return $this->format($this->field, $item->identifiableName());
                     }
                 }
             } catch (\Exception $e) {
@@ -180,13 +185,14 @@ class Revision extends Eloquent
             // if there was an issue
             // or, if it's a normal value
 
-            $mutator = 'get' . Str::studly($this->key) . 'Attribute';
+            // the accessor method is called getFieldDisplayAttribute in JB
+            $mutator = 'get' . Str::studly($this->field) . 'DisplayAttribute';
             if (method_exists($main_model, $mutator)) {
-                return $this->format($this->key, $main_model->$mutator($this->$which_value));
+                return $this->format($this->field, $main_model->$mutator($this->$which_value));
             }
         }
 
-        return $this->format($this->key, $this->$which_value);
+        return $this->format($this->field, $this->$which_value);
     }
 
     /**
@@ -198,10 +204,10 @@ class Revision extends Eloquent
     {
         $isRelated = false;
         $idSuffix = '_id';
-        $pos = strrpos($this->key, $idSuffix);
+        $pos = strrpos($this->field, $idSuffix);
 
         if ($pos !== false
-            && strlen($this->key) - strlen($idSuffix) === $pos
+            && strlen($this->field) - strlen($idSuffix) === $pos
         ) {
             $isRelated = true;
         }
@@ -218,7 +224,7 @@ class Revision extends Eloquent
     {
         $idSuffix = '_id';
 
-        return substr($this->key, 0, strlen($this->key) - strlen($idSuffix));
+        return substr($this->field, 0, strlen($this->field) - strlen($idSuffix));
     }
 
     /**
@@ -273,19 +279,19 @@ class Revision extends Eloquent
     /**
      * Format the value according to the $revisionFormattedFields array.
      *
-     * @param  $key
+     * @param  $field
      * @param  $value
      *
      * @return string formatted value
      */
-    public function format($key, $value)
+    public function format($field, $value)
     {
         $related_model = $this->getActualClassNameForMorph($this->revisionable_type);
         $related_model = new $related_model;
         $revisionFormattedFields = $related_model->getRevisionFormattedFields();
 
-        if (isset($revisionFormattedFields[$key])) {
-            return FieldFormatter::format($key, $value, $revisionFormattedFields);
+        if (isset($revisionFormattedFields[$field])) {
+            return FieldFormatter::format($field, $value, $revisionFormattedFields);
         } else {
             return $value;
         }
