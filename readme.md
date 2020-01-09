@@ -1,3 +1,12 @@
+This custom fork replicates the custom changes from the original UNC revisionable [fork](https://github.com/UNC-Libraries/revisionable) onto an updated fork of Revisionable. 
+It will only work with [Jitterbug](https://github.com/UNC-Libraries/jitterbug).
+
+Added features:
+* "key" changed to "field"
+* adding transaction ID and IP address recording
+* getting the class basename in one instance
+* support for soft deleted foreign keys
+
 <img src="https://cdn1.wwe.com/static/ossimg/revisionableghbanner.png" style="width: 100%" alt="Revisionable for Laravel" />
 
 [![Laravel 4.x](https://img.shields.io/badge/Laravel-4.x-yellow.svg?style=flat-square)](https://laravel.com/)

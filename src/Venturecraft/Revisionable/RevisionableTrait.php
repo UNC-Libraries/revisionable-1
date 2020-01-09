@@ -301,7 +301,7 @@ trait RevisionableTrait
 
     /**
      * Get the transaction that this revision is a part of. This value
-     * should be set from within the transaction block while saving
+     * is set from within the transaction block in Jitterbug while saving
      * your revisionable model.
      **/
     public function getTransactionId()
