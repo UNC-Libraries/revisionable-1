@@ -248,7 +248,9 @@ class Revisionable extends Eloquent
             $revisions[] = array(
                 'revisionable_type' => $this->getMorphClass(),
                 'revisionable_id' => $this->getKey(),
-                'key' => self::CREATED_AT,
+                'transaction_id'        => $this->getTransactionId(),
+                'ip_address'            => \Request::ip(),
+                'field' => self::CREATED_AT,
                 'old_value' => $this->{self::CREATED_AT},
                 'new_value' => null,
                 'user_id' => $this->getSystemUserId(),
