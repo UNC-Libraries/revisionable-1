@@ -12,7 +12,7 @@ class CreateRevisionsTable extends Migration
     public function up()
     {
         Schema::create('revisions', function ($table) {
-            $table->increments('id');
+            $table->bigIncrements('id');
             $table->string('revisionable_type');
             $table->integer('revisionable_id');
             $table->string('transaction_id');
@@ -34,6 +34,6 @@ class CreateRevisionsTable extends Migration
      */
     public function down()
     {
-        Schema::drop('revisions');
+        Schema::dropIfExists('revisions');
     }
 }
