@@ -5,7 +5,6 @@ namespace Venturecraft\Revisionable;
 use Illuminate\Support\Str;
 use Illuminate\Database\Eloquent\Model as Eloquent;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 /**
  * Revision.
@@ -17,8 +16,6 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
  */
 class Revision extends Eloquent
 {
-    use HasFactory;
-    
     /**
      * @var string
      */
