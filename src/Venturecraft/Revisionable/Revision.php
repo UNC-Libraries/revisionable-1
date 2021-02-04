@@ -302,6 +302,6 @@ class Revision extends Eloquent
 
     protected static function newFactory()
     {
-        return new \Jitterbug\Database\Factories\RevisionFactory;
+        return new \Jitterbug\database\factories\RevisionFactory;
     }
 }
