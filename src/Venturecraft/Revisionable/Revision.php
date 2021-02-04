@@ -18,7 +18,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 class Revision extends Eloquent
 {
     use HasFactory;
-    
+
     /**
      * @var string
      */
@@ -298,5 +298,10 @@ class Revision extends Eloquent
         } else {
             return $value;
         }
+    }
+
+    protected static function newFactory()
+    {
+        return new \Jitterbug\Database\Factories\RevisionFactory;
     }
 }
